@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+	<PropertyGroup>
+		<AssemblyName>Banking.Accounts.Infrastructure.Transport</AssemblyName>
+		<RootNamespace>Banking.Accounts.Infrastructure.Transport</RootNamespace>
+		<DocumentationFile>bin\$(AssemblyName).xml</DocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Abstraction\Infrastructure\Transport\Transport.csproj" />
+	  <ProjectReference Include="..\Contracts\Contracts.csproj" />
+	</ItemGroup>
+	
+</Project>

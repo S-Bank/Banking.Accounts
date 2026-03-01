@@ -1,0 +1,26 @@
+<Solution>
+  <Folder Name="/Abstractions/">
+    <Project Path="Abstraction/Logic/Logic.csproj" />
+  </Folder>
+  <Folder Name="/Abstractions/Infrastructure/">
+    <Project Path="Abstraction/Infrastructure/Storage/Storage.csproj" />
+    <Project Path="Abstraction/Infrastructure/Transport/Transport.csproj" Id="6b3c9b95-6d38-40d0-813f-2f6baeb1b059" />
+  </Folder>
+  <Folder Name="/Infrastructure/">
+    <Project Path="Infrastructure/Contracts/Contracts.csproj" />
+    <Project Path="Infrastructure/Storage/Storage.csproj" />
+    <Project Path="Infrastructure/Transport/Transport.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="docker-compose.yml" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/Элементы решения/">
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Project Path="Logic/Logic.csproj" />
+  <Project Path="Models/Models.csproj" />
+  <Project Path="Service/Service.csproj" />
+</Solution>

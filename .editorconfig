@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# CS1570: Комментарий XML содержит неправильно сформированный XML
+dotnet_diagnostic.CS1570.severity = none
