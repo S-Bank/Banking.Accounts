@@ -169,6 +169,11 @@ public sealed class AccountContext : DbContext
             .IsRequired();
 
         _ = modelBuilder.Entity<Outbox>()
+            .Property(t => t.AccountId)
+            .HasConversion<IdValueConverter<AccountId>>()
+            .IsRequired();
+
+        _ = modelBuilder.Entity<Outbox>()
             .Property(o => o.Type)
             .IsRequired();
 
@@ -201,6 +206,12 @@ public sealed class AccountContext : DbContext
                 v => v.HasValue ? v.Value.UtcDateTime : (DateTimeOffset?)null,
                 v => v)
             .IsRequired(false);
+
+        _ = modelBuilder.Entity<Outbox>()
+            .HasOne<Account>()
+            .WithMany()
+            .HasForeignKey(t => t.AccountId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Outbox>()
             .HasIndex(o => new { o.ProcessedOn, o.OccurredOn })

@@ -1,21 +1,41 @@
 ﻿using Banking.Accounts.Abstractions.Infrastructure.Storage;
+using Banking.Accounts.Abstractions.Infrastructure.Transport.Processor;
 
 namespace Banking.Accounts.Service.BackgroundJobs;
 
-public sealed class OutboxProcessor : BackgroundService
+/// <summary>
+/// Фоновый сервис для периодической обработки необработанных сообщений
+/// из таблицы Outbox и их публикации в брокер сообщений.
+/// </summary>
+public sealed class OutboxJob : BackgroundService
 {
-    public OutboxProcessor(
+    /// <summary>
+    /// Инициализирует новый экземпляр сервиса.
+    /// </summary>
+    /// <param name="serviceProvider">
+    /// Провайдер сервисов для создания областей видимости.
+    /// </param>
+    /// <param name="logger">
+    /// Логгер.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// Выбрасывается, если любой из обязательных параметров равен null.
+    /// </exception>
+    public OutboxJob(
         IServiceProvider serviceProvider,
-        ILogger<OutboxProcessor> logger)
+        ILogger<OutboxJob> logger)
     {
+        ArgumentNullException.ThrowIfNull(serviceProvider);
+        ArgumentNullException.ThrowIfNull(logger);
+
         _serviceProvider = serviceProvider;
         _logger = logger;
     }
 
+    /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("Outbox Processor запущен.");
-        
 
         while (true)
         {
@@ -48,48 +68,11 @@ public sealed class OutboxProcessor : BackgroundService
     private async Task ProcessOutboxMessagesAsync(CancellationToken ct)
     {
         using var scope = _serviceProvider.CreateScope();
-        var unitOfWork = scope.ServiceProvider.GetRequiredService<IAccountUnitOfWork>();
-        var publisher = scope.ServiceProvider.GetRequiredService<ISystemEventPublisher>();
+        var publisher = scope.ServiceProvider.GetRequiredService<ISystemEventProcessor>();
 
-        var messages = await unitOfWork.Outbox.GetUnprocessedAsync(BATCH_SIZE, ct);
-
-        if (!messages.Any()) return;
-
-        foreach (var message in messages)
-        {
-            try
-            {
-                await publisher.PublishAsync(message.Type, message.Content, ct);
-
-                message.MarkAsProcessed();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Не удалось отправить сообщение {Id}", message.Id);
-                message.Fail(ex.Message);
-            }
-
-            unitOfWork.Outbox.Update(message);
-        }
-
-        await unitOfWork.SaveAsync(ct);
+        await publisher.ProcessAsync(ct);
     }
 
     private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<OutboxProcessor> _logger;
-
-    private const int BATCH_SIZE = 20;
-}
-
-public interface ISystemEventPublisher
-{
-    Task PublishAsync(string eventType, string content, CancellationToken ct);
-}
-
-public sealed class SystemEventPublisher : ISystemEventPublisher
-{
-    public async Task PublishAsync(string eventType, string content, CancellationToken ct)
-    {
-        await Task.Delay(200,ct);
-    }
+    private readonly ILogger<OutboxJob> _logger;
 }

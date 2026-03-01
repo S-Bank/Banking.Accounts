@@ -5,7 +5,6 @@ using Banking.Accounts.Models.Commands;
 using Banking.Accounts.Models.Transaction;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json.Serialization;
 
 namespace Banking.Accounts.Service.Controllers;
 
@@ -58,6 +57,9 @@ public class AccountsController : ControllerBase
     /// <summary>
     /// Пополнение счета клиента.
     /// </summary>
+    /// <param name="idempotencyKey">
+    /// Уникальный ключ идемпотентности.
+    /// </param>
     /// <param name="id">
     /// Идентификатор счета.
     /// </param>
@@ -84,14 +86,32 @@ public class AccountsController : ControllerBase
 
         var command = new DepositCommand(
             new(id),
-            referenceId, 
+            referenceId,
             new(request.Amount.Value, request.Amount.Currency));
 
         var balance = await _mediator.Send(command, token);
 
-        return StatusCode(StatusCodes.Status202Accepted, new DepositResponse { Balance = balance.Value});
+        return StatusCode(StatusCodes.Status202Accepted, new DepositResponse { Balance = balance.Value });
     }
 
+    /// <summary>
+    /// Списание средств со счета клиента.
+    /// </summary>
+    /// <param name="idempotencyKey">
+    /// Уникальный ключ идемпотентности.
+    /// </param>
+    /// <param name="id">
+    /// Идентификатор счета.
+    /// </param>
+    /// <param name="request">
+    /// Данные для списания.
+    /// </param>
+    /// <param name="token">
+    /// Токен отмены операции.
+    /// </param>
+    /// <returns>
+    /// Текущий баланс счета после списания.
+    /// </returns>
     [ProducesResponseType(typeof(AccountId), StatusCodes.Status202Accepted)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [EndpointDescription("Списание со счета. Требует X-Idempotency-Key в заголовках.")]
@@ -108,12 +128,12 @@ public class AccountsController : ControllerBase
 
         var command = new WithdrawCommand(
             new(id),
-            referenceId, 
+            referenceId,
             new(request.Amount.Value, request.Amount.Currency));
-        
+
         var balance = await _mediator.Send(command, token);
 
-        return StatusCode(StatusCodes.Status202Accepted, new WithdrawResponse { Balance = balance.Value});
+        return StatusCode(StatusCodes.Status202Accepted, new WithdrawResponse { Balance = balance.Value });
     }
 
     private readonly IMediator _mediator;

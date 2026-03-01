@@ -1,14 +1,32 @@
 ﻿using Banking.Accounts.Abstractions.Infrastructure.Storage;
 using Banking.Accounts.Models.Account;
 using Banking.Accounts.Models.Commands;
+using Banking.Accounts.Models.Exceptions;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Banking.Accounts.Logic.Commands;
 
+/// <summary>
+/// Обработчик команды списания средств со счета.
+/// </summary>
 public sealed class WithdrawCommandHandler : IRequestHandler<WithdrawCommand, Balance>
 {
-
+    /// <summary>
+    /// Инициализирует новый экземпляр обработчика команды списания средств.
+    /// </summary>
+    /// <param name="unitOfWork">
+    /// Единица работы для управления транзакциями и доступа к репозиториям.
+    /// </param>
+    /// <param name="publisher">
+    /// Издатель для рассылки доменных событий.
+    /// </param>
+    /// <param name="logger">
+    /// Экземпляр логгера для трассировки процесса списания.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// Выбрасывается, если любой из обязательных параметров равен null.
+    /// </exception>
     public WithdrawCommandHandler(
         IAccountUnitOfWork unitOfWork,
         IPublisher publisher,
@@ -22,21 +40,34 @@ public sealed class WithdrawCommandHandler : IRequestHandler<WithdrawCommand, Ba
         _publisher = publisher;
         _logger = logger;
     }
+
+    /// <summary>
+    /// Выполняет процесс списания средств с проверкой баланса и обеспечением идемпотентности.
+    /// </summary>
+    /// <param name="request">
+    /// Команда, содержащая идентификатор счета, сумму списания и уникальный идентификатор операции.
+    /// </param>
+    /// <param name="token">
+    /// Токен отмены асинхронной операции.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// Выбрасывается, если объект запроса равен null.
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    /// Выбрасывается, если счет не найден или на балансе недостаточно средств для списания.
+    /// </exception>
+    /// <exception cref="AccountDomainException">
+    /// Выбрасывается при нарушении бизнес-правил агрегата (неактивный статус или конфликт валют).
+    /// </exception>
+    /// <returns>
+    /// Обновленный баланс счета после успешного завершения транзакции.
+    /// </returns>
     public async Task<Balance> Handle(WithdrawCommand request, CancellationToken token)
     {
         ArgumentNullException.ThrowIfNull(request);
         token.ThrowIfCancellationRequested();
 
         using var scope = _logger.BeginScope("{AccountId}", request.AccountId);
-
-        if (await _unitOfWork.Transactions.ExistsAsync(request.ReferenceId, token))
-        {
-            _logger.LogInformation("Команда с ReferenceId {ReferenceId} уже была обработана.", request.ReferenceId);
-
-            var existingAccount = await _unitOfWork.Accounts.FindAsync(request.AccountId, token);
-
-            return existingAccount!.Balance;
-        }
 
         _logger.LogInformation("Начата списание со счета.");
 
@@ -48,7 +79,6 @@ public sealed class WithdrawCommandHandler : IRequestHandler<WithdrawCommand, Ba
 
             throw new InvalidOperationException($"Счет с идентификатором {request.AccountId} не найден.");
         }
-
 
         account.Withdraw(request.Amount, request.ReferenceId);
 

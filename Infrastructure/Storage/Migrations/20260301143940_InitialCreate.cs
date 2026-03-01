@@ -39,6 +39,7 @@ namespace Banking.Accounts.Infrastructure.Storage.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    AccountId = table.Column<Guid>(type: "uuid", nullable: false),
                     Type = table.Column<string>(type: "text", nullable: false),
                     Content = table.Column<string>(type: "jsonb", nullable: false),
                     OccurredOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -49,6 +50,12 @@ namespace Banking.Accounts.Infrastructure.Storage.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Outboxs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Outboxs_Accounts_AccountId",
+                        column: x => x.AccountId,
+                        principalTable: "Accounts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -73,6 +80,11 @@ namespace Banking.Accounts.Infrastructure.Storage.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Outboxs_AccountId",
+                table: "Outboxs",
+                column: "AccountId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Outboxs_ProcessedOn_OccurredOn",

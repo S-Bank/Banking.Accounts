@@ -1,18 +1,25 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace Banking.Accounts.Infrastructure.Storage.Context;
 
+/// <summary>
+/// Конвертер значений для Entity Framework Core, преобразующий типизированные идентификаторы (Value Objects)
+/// в тип <see cref="Guid"/> для хранения в базе данных и обратно.
+/// </summary>
+/// <typeparam name="TId">
+/// Тип типизированного идентификатора. Должен иметь конструктор, принимающий <see cref="Guid"/>,
+/// и свойство 'Value' типа <see cref="Guid"/>.
+/// </typeparam>
 public sealed class IdValueConverter<TId> : ValueConverter<TId, Guid>
  where TId : class
 {
-    // Компилируем функции один раз при инициализации класса
     private static readonly Func<Guid, TId> _factory = CreateFactory();
     private static readonly Func<TId, Guid> _getter = CreateGetter();
 
+    /// <summary>
+    /// Инициализирует новый экземпляр конвертера.
+    /// </summary>
     public IdValueConverter() : base(
         id => _getter(id),
         value => _factory(value))

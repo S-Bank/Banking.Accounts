@@ -1,6 +1,7 @@
 ﻿using Banking.Accounts.Abstractions.Infrastructure.Storage;
 using Banking.Accounts.Models.Account;
 using Banking.Accounts.Models.Commands;
+using Banking.Accounts.Models.Exceptions;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -55,6 +56,9 @@ public sealed class DepositCommandHandler : IRequestHandler<DepositCommand, Bala
     /// <exception cref="InvalidOperationException">
     /// Выбрасывается, если указанный счет не найден.
     /// </exception>
+    /// <exception cref="AccountDomainException">
+    /// Выбрасывается при нарушении бизнес-правил агрегата (например, несовпадение валют).
+    /// </exception>
     /// <returns>
     /// Обновленный баланс счета после завершения транзакции.
     /// </returns>
@@ -65,15 +69,6 @@ public sealed class DepositCommandHandler : IRequestHandler<DepositCommand, Bala
         token.ThrowIfCancellationRequested();
 
         using var scope = _logger.BeginScope("{AccountId}", request.AccountId);
-
-        if (await _unitOfWork.Transactions.ExistsAsync(request.ReferenceId, token))
-        {
-            _logger.LogInformation("Команда с ReferenceId {ReferenceId} уже была обработана.", request.ReferenceId);
-
-            var existingAccount = await _unitOfWork.Accounts.FindAsync(request.AccountId, token);
-
-            return existingAccount!.Balance;
-        }
 
         _logger.LogInformation("Начата пополнения счета.");
 

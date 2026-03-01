@@ -15,6 +15,7 @@ public sealed class RepositoryContext : IRepositoryContext
     /// </inheritdoc>
     public DbSet<Transaction> Transactions => _context.Transactions;
 
+    /// </inheritdoc>
     public DbSet<Outbox> Outbox => _context.Outboxs;
 
     /// <summary>

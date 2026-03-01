@@ -7,8 +7,11 @@ namespace Banking.Accounts.Abstractions.Infrastructure.Storage.Repositories;
 /// </summary>
 public interface ITransactionRepository
 {
-
-    Task<bool> ExistsAsync(ReferenceId referenceId, CancellationToken token);
-
+    /// <summary>
+    /// Добавляет новую транзакцию в контекст данных.
+    /// </summary>
+    /// <param name="model">
+    /// Модель транзакции для сохранения.
+    /// </param>
     void Add(Transaction model);
 }

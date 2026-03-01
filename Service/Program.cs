@@ -61,7 +61,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddLogic();
 builder.Services.AddStorage(builder.Configuration);
 builder.Services.AddTransport(builder.Configuration);
-builder.Services.AddHostedService<OutboxProcessor>();
+builder.Services.AddHostedService<OutboxJob>();
 
 
 var app = builder.Build();

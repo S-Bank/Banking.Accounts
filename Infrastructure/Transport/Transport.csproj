@@ -13,6 +13,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="Confluent.Kafka" Version="2.13.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Abstraction\Infrastructure\Storage\Storage.csproj" />
 	  <ProjectReference Include="..\..\Abstraction\Infrastructure\Transport\Transport.csproj" />
 	  <ProjectReference Include="..\Contracts\Contracts.csproj" />
 	</ItemGroup>

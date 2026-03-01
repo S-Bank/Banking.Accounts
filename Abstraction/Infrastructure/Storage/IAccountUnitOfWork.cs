@@ -17,5 +17,8 @@ public interface IAccountUnitOfWork : IUnitOfWork
     /// </summary>
     ITransactionRepository Transactions { get; }
 
+    /// <summary>
+    /// Репозиторий для управления очередью исходящих событий.
+    /// </summary>
     IOutboxRepository Outbox { get; }
 }

@@ -1,5 +1,6 @@
 ﻿using Banking.Accounts.Models.Account;
 using Banking.Accounts.Models.DomainEvents;
+using Banking.Accounts.Models.Exceptions;
 using Banking.Accounts.Models.Transaction;
 
 namespace Banking.Accounts.Abstractions.Logic.Account;
@@ -35,12 +36,12 @@ public interface IAccount
     Status Status { get; }
 
     /// <summary>
-    /// Список домменных событий.
+    /// Список доменных событий.
     /// </summary>
     IReadOnlyCollection<IDomainEvent> DomainEvents { get; }
 
     /// <summary>
-    /// Отчистить доменные события.
+    /// Очистить доменные события.
     /// </summary>
     void ClearDomainEvents();
 
@@ -51,10 +52,13 @@ public interface IAccount
     /// Объект значения суммы пополнения.
     /// </param>
     /// <param name="referenceId">
-    /// Идентификатор транзакции.
+    /// Внешний идентификатор операции.
     /// </param>
     /// <exception cref="ArgumentNullException">
-    /// Выбрасывается, если обязательные параметры равны null.
+    /// Выбрасывается, если параметры равны null.
+    /// </exception>
+    /// <exception cref="AccountDomainException">
+    /// Выбрасывается при нарушении бизнес-правил (неверный статус или валюта).
     /// </exception>
     void Deposit(Amount amount, ReferenceId referenceId);
 
@@ -65,10 +69,13 @@ public interface IAccount
     /// Объект значения суммы списания.
     /// </param>
     /// <param name="referenceId">
-    /// Идентификатор транзакции.
+    /// Внешний идентификатор операции.
     /// </param>
     /// <exception cref="ArgumentNullException">
-    /// Выбрасывается, если обязательные параметры равны null.
+    /// Выбрасывается, если параметры равны null.
+    /// </exception>
+    /// <exception cref="AccountDomainException">
+    /// Выбрасывается при недостаточном балансе или неверном статусе.
     /// </exception>
     void Withdraw(Amount amount, ReferenceId referenceId);
 }

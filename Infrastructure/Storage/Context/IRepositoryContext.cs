@@ -18,6 +18,9 @@ public interface IRepositoryContext
     /// </summary>
     DbSet<Transaction> Transactions { get; }
 
+    // <summary>
+    /// Набор данных очереди исходящих событий.
+    /// </summary>
     DbSet<Outbox> Outbox { get; }
 
     /// <summary>

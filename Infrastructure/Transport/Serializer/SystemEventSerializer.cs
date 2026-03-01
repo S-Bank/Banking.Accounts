@@ -5,6 +5,9 @@ using System.Text.Json;
 
 namespace Banking.Accounts.Infrastructure.Transport.Serializer;
 
+/// <summary>
+/// Реализация сериализатора событий.
+/// </summary>
 public class SystemEventSerializer : ISystemEventSerializer
 {
     private static readonly JsonSerializerOptions _options = new()
@@ -13,6 +16,7 @@ public class SystemEventSerializer : ISystemEventSerializer
         WriteIndented = false
     };
 
+    /// <inheritdoc />
     public string Serialize<TDomainEvent>(TDomainEvent domainEvent) where TDomainEvent : IDomainEvent
     {
         return domainEvent switch

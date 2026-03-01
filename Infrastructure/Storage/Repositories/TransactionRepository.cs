@@ -1,10 +1,5 @@
 ﻿using Banking.Accounts.Abstractions.Infrastructure.Storage.Repositories;
 using Banking.Accounts.Infrastructure.Storage.Context;
-using Banking.Accounts.Infrastructure.Storage.Models;
-using Banking.Accounts.Models.DomainEvents;
-using Banking.Accounts.Models.Transaction;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace Banking.Accounts.Infrastructure.Storage.Repositories;
@@ -38,11 +33,7 @@ public sealed class TransactionRepository :
         _logger = logger;
     }
 
-    public async Task<bool> ExistsAsync(ReferenceId referenceId, CancellationToken token)
-    {
-      return await _context.Transactions.AnyAsync(t=>t.ReferenceId == referenceId);
-    }
-
+    /// <inheritdoc />
     public void Add(Accounts.Models.Transaction.Transaction model)
     {
         var dbModel = new Models.Transaction
@@ -58,6 +49,6 @@ public sealed class TransactionRepository :
         _context.Transactions.Add(dbModel);
     }
 
-    private IRepositoryContext _context;
-    private ILogger<TransactionRepository> _logger;
+    private readonly IRepositoryContext _context;
+    private readonly ILogger<TransactionRepository> _logger;
 }

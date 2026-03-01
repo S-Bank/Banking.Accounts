@@ -15,7 +15,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Banking.Accounts.Infrastructure.Storage.Migrations
 {
     [DbContext(typeof(AccountContext))]
-    [Migration("20260301110619_InitialCreate")]
+    [Migration("20260301143940_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -64,6 +64,9 @@ namespace Banking.Accounts.Infrastructure.Storage.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("jsonb");
@@ -88,6 +91,8 @@ namespace Banking.Accounts.Infrastructure.Storage.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
 
                     b.HasIndex("ProcessedOn", "OccurredOn")
                         .HasFilter("\"ProcessedOn\" IS NULL");
@@ -137,6 +142,15 @@ namespace Banking.Accounts.Infrastructure.Storage.Migrations
                     b.HasIndex("AccountId", "CreatedAt");
 
                     b.ToTable("Transactions");
+                });
+
+            modelBuilder.Entity("Banking.Accounts.Infrastructure.Storage.Models.Outbox", b =>
+                {
+                    b.HasOne("Banking.Accounts.Infrastructure.Storage.Models.Account", null)
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Banking.Accounts.Infrastructure.Storage.Models.Transaction", b =>

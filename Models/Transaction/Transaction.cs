@@ -2,6 +2,9 @@
 
 namespace Banking.Accounts.Models.Transaction;
 
+/// <summary>
+/// Модель, представляющая финансовую транзакцию по банковскому счету.
+/// </summary>
 public sealed class Transaction
 {
     /// <summary>
@@ -34,6 +37,33 @@ public sealed class Transaction
     /// </summary>
     public DateTimeOffset CreatedAt { get; private set; }
 
+    /// <summary>
+    /// Инициализирует новый экземпляр транзакции.
+    /// </summary>
+    /// <param name="id">
+    /// Внутренний идентификатор.
+    /// </param>
+    /// <param name="accountId">
+    /// Идентификатор счета.
+    /// </param>
+    /// <param name="referenceId">
+    /// Внешний идентификатор.
+    /// </param>
+    /// <param name="amount">
+    /// Сумма операции.
+    /// </param>
+    /// <param name="type">
+    /// Тип операции
+    /// </param>
+    /// <param name="createdAt">
+    /// Время совершения.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    /// Выбрасывается, если обязательные параметры равны null.
+    /// </exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Выбрасывается, если тип транзакции некорректен.
+    /// </exception>
     public Transaction(
         TransactionId id,
         AccountId accountId,
