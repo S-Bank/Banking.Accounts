@@ -10,7 +10,7 @@ namespace Banking.Accounts.Logic.Commands;
 /// <summary>
 /// Обработчик команды открытия нового счета.
 /// </summary>
-public class OpenAccountCommandHandler : IRequestHandler<OpenAccountCommand, AccountId>
+public class OpenAccountCommandHandler : IRequestHandler<OpenAccountCommand>
 {
     /// <summary>
     /// Инициализирует новый экземпляр обработчика.
@@ -44,7 +44,7 @@ public class OpenAccountCommandHandler : IRequestHandler<OpenAccountCommand, Acc
     /// <summary>
     /// Обрабатывает команду открытия счета.
     /// </summary>
-    /// <param name="request">
+    /// <param name="commandParameters">
     /// Данные для открытия счета.
     /// </param>
     /// <param name="token">
@@ -56,25 +56,23 @@ public class OpenAccountCommandHandler : IRequestHandler<OpenAccountCommand, Acc
     /// <returns>
     /// Идентификатор созданного счета.
     /// </returns>
-    public async Task<AccountId> Handle(OpenAccountCommand request, CancellationToken token)
+    public async Task Handle(OpenAccountCommand commandParameters, CancellationToken token)
     {
-        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(commandParameters);
 
         token.ThrowIfCancellationRequested();
 
-        using var scope = _logger.BeginScope("{CustomerId}", request.CustomerId);
+        using var scope = _logger.BeginScope("{CustomerId}", commandParameters.CustomerId);
 
         _logger.LogInformation("Начата процедура открытия нового счета.");
 
-        var newAccount = _accountFactory.CreateNew(request.CustomerId, request.Currency);
+        var newAccount = _accountFactory.CreateNew(commandParameters.CustomerId, commandParameters.Currency);
 
         _unitOfWork.Accounts.AddAccount(newAccount);
 
         await _unitOfWork.SaveAsync(token);
 
         _logger.LogInformation("Счет {AccountId} успешно сохранен.", newAccount.Id);
-
-        return newAccount.Id;
     }
 
     private readonly IAccountFactory _accountFactory;

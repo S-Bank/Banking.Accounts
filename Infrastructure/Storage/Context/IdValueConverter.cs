@@ -28,7 +28,7 @@ public sealed class IdValueConverter<TId> : ValueConverter<TId, Guid>
     private static Func<Guid, TId> CreateFactory()
     {
         var parameter = Expression.Parameter(typeof(Guid), "value");
-        var constructor = typeof(TId).GetConstructor(new[] { typeof(Guid) })
+        var constructor = typeof(TId).GetConstructor([typeof(Guid)])
             ?? throw new InvalidOperationException($"{typeof(TId).Name} must have a constructor with a single Guid parameter.");
 
         var body = Expression.New(constructor, parameter);

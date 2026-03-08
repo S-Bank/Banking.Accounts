@@ -20,4 +20,4 @@ public sealed record WithdrawCommand(
     AccountId AccountId,
     ReferenceId ReferenceId,
     Amount Amount)
-    : IRequest<Balance>;
+    : IRequest;

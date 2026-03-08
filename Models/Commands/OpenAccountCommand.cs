@@ -6,6 +6,9 @@ namespace Banking.Accounts.Models.Commands;
 /// <summary>
 /// Команда на добавление счета.
 /// </summary>
+/// <param name="AccountId">
+/// Идентификатор счета.
+/// </param>
 /// <param name="CustomerId">
 /// Идентификатор клиента.
 /// </param>
@@ -13,6 +16,7 @@ namespace Banking.Accounts.Models.Commands;
 /// Валюта счета.
 /// </param>
 public sealed record OpenAccountCommand(
+    AccountId AccountId,
     CustomerId CustomerId,
     Currency Currency
-) : IRequest<AccountId>;
+) : IRequest;

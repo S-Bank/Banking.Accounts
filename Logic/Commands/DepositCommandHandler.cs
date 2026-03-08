@@ -1,5 +1,4 @@
 ﻿using Banking.Accounts.Abstractions.Infrastructure.Storage;
-using Banking.Accounts.Models.Account;
 using Banking.Accounts.Models.Commands;
 using Banking.Accounts.Models.Exceptions;
 using MediatR;
@@ -10,7 +9,7 @@ namespace Banking.Accounts.Logic.Commands;
 /// <summary>
 /// Обработчик команды пополнения счета.
 /// </summary>
-public sealed class DepositCommandHandler : IRequestHandler<DepositCommand, Balance>
+public sealed class DepositCommandHandler : IRequestHandler<DepositCommand>
 {
     /// <summary>
     /// Инициализирует новый экземпляр обработчика.
@@ -44,7 +43,7 @@ public sealed class DepositCommandHandler : IRequestHandler<DepositCommand, Bala
     /// <summary>
     /// Обрабатывает запрос на пополнение счета.
     /// </summary>
-    /// <param name="request">
+    /// <param name="commandParameters">
     /// Команда, содержащая идентификатор счета и сумму пополнения.
     /// </param>
     /// <param name="token">
@@ -62,26 +61,26 @@ public sealed class DepositCommandHandler : IRequestHandler<DepositCommand, Bala
     /// <returns>
     /// Обновленный баланс счета после завершения транзакции.
     /// </returns>
-    public async Task<Balance> Handle(DepositCommand request, CancellationToken token)
+    public async Task Handle(DepositCommand commandParameters, CancellationToken token)
     {
-        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(commandParameters);
 
         token.ThrowIfCancellationRequested();
 
-        using var scope = _logger.BeginScope("{AccountId}", request.AccountId);
+        using var scope = _logger.BeginScope("{AccountId}", commandParameters.AccountId);
 
         _logger.LogInformation("Начата пополнения счета.");
 
-        var account = await _unitOfWork.Accounts.FindAsync(request.AccountId, token);
+        var account = await _unitOfWork.Accounts.FindAsync(commandParameters.AccountId, token);
 
         if (account is null)
         {
-            _logger.LogWarning("Счет с идентификатором {AccountId} не найден.", request.AccountId);
+            _logger.LogWarning("Счет с идентификатором {AccountId} не найден.", commandParameters.AccountId);
 
-            throw new InvalidOperationException($"Счет с идентификатором {request.AccountId} не найден.");
+            throw new InvalidOperationException($"Счет с идентификатором {commandParameters.AccountId} не найден.");
         }
 
-        account.Deposit(request.Amount, request.ReferenceId);
+        account.Deposit(commandParameters.Amount, commandParameters.ReferenceId);
 
         await _unitOfWork.Accounts.UpdateAsync(account, token);
 
@@ -95,8 +94,6 @@ public sealed class DepositCommandHandler : IRequestHandler<DepositCommand, Bala
         await _unitOfWork.SaveAsync(token);
 
         _logger.LogInformation("Счет {AccountId} успешно пополнен.", account.Id);
-
-        return account.Balance;
     }
 
     private readonly IAccountUnitOfWork _unitOfWork;

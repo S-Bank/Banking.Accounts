@@ -1,4 +1,5 @@
-﻿using Banking.Accounts.Models.Account;
+﻿using Banking.Accounts.Infrastructure.Contracts.Models;
+using Banking.Accounts.Models.Account;
 using System.Text.Json.Serialization;
 
 namespace Banking.Accounts.Infrastructure.Contracts.Input.Request.Accounts;
@@ -12,5 +13,5 @@ public sealed class DepositRequest
     /// Сумма, которую необходимо зачислить на счет.
     /// </summary>
     [JsonPropertyName("amount")]
-    public required Amount Amount { get; set; }
+    public required Models.Amount Amount { get; set; }
 }

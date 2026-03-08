@@ -1,5 +1,4 @@
 ﻿using Banking.Accounts.Abstractions.Infrastructure.Storage;
-using Banking.Accounts.Models.Account;
 using Banking.Accounts.Models.Commands;
 using Banking.Accounts.Models.Exceptions;
 using MediatR;
@@ -10,7 +9,7 @@ namespace Banking.Accounts.Logic.Commands;
 /// <summary>
 /// Обработчик команды списания средств со счета.
 /// </summary>
-public sealed class WithdrawCommandHandler : IRequestHandler<WithdrawCommand, Balance>
+public sealed class WithdrawCommandHandler : IRequestHandler<WithdrawCommand>
 {
     /// <summary>
     /// Инициализирует новый экземпляр обработчика команды списания средств.
@@ -44,7 +43,7 @@ public sealed class WithdrawCommandHandler : IRequestHandler<WithdrawCommand, Ba
     /// <summary>
     /// Выполняет процесс списания средств с проверкой баланса и обеспечением идемпотентности.
     /// </summary>
-    /// <param name="request">
+    /// <param name="commandParameters">
     /// Команда, содержащая идентификатор счета, сумму списания и уникальный идентификатор операции.
     /// </param>
     /// <param name="token">
@@ -62,25 +61,25 @@ public sealed class WithdrawCommandHandler : IRequestHandler<WithdrawCommand, Ba
     /// <returns>
     /// Обновленный баланс счета после успешного завершения транзакции.
     /// </returns>
-    public async Task<Balance> Handle(WithdrawCommand request, CancellationToken token)
+    public async Task Handle(WithdrawCommand commandParameters, CancellationToken token)
     {
-        ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(commandParameters);
         token.ThrowIfCancellationRequested();
 
-        using var scope = _logger.BeginScope("{AccountId}", request.AccountId);
+        using var scope = _logger.BeginScope("{AccountId}", commandParameters.AccountId);
 
         _logger.LogInformation("Начата списание со счета.");
 
-        var account = await _unitOfWork.Accounts.FindAsync(request.AccountId, token);
+        var account = await _unitOfWork.Accounts.FindAsync(commandParameters.AccountId, token);
 
         if (account is null)
         {
-            _logger.LogWarning("Счет с идентификатором {AccountId} не найден.", request.AccountId);
+            _logger.LogWarning("Счет с идентификатором {AccountId} не найден.", commandParameters.AccountId);
 
-            throw new InvalidOperationException($"Счет с идентификатором {request.AccountId} не найден.");
+            throw new InvalidOperationException($"Счет с идентификатором {commandParameters.AccountId} не найден.");
         }
 
-        account.Withdraw(request.Amount, request.ReferenceId);
+        account.Withdraw(commandParameters.Amount, commandParameters.ReferenceId);
 
         await _unitOfWork.Accounts.UpdateAsync(account, token);
 
@@ -94,9 +93,6 @@ public sealed class WithdrawCommandHandler : IRequestHandler<WithdrawCommand, Ba
         await _unitOfWork.SaveAsync(token);
 
         _logger.LogInformation("Со счета {AccountId} успешно списано.", account.Id);
-
-        return account.Balance;
-
     }
 
     private readonly IAccountUnitOfWork _unitOfWork;

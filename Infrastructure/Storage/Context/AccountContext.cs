@@ -9,8 +9,8 @@ using Transaction = Banking.Accounts.Infrastructure.Storage.Models.Transaction;
 
 namespace Banking.Accounts.Infrastructure.Storage.Context;
 
-// <summary>
-/// Контекст базы данных для работы со счетами и транзакциями.
+/// <summary>
+/// Контекст базы данных.
 /// </summary>
 public sealed class AccountContext : DbContext
 {
@@ -70,7 +70,7 @@ public sealed class AccountContext : DbContext
         ConfigureOutbox(modelBuilder);
     }
 
-    private void ConfigureAccount(ModelBuilder modelBuilder)
+    private static void ConfigureAccount(ModelBuilder modelBuilder)
     {
         _ = modelBuilder.Entity<Account>()
             .HasKey(a => a.Id);
@@ -97,7 +97,7 @@ public sealed class AccountContext : DbContext
             .IsRequired();
     }
 
-    private void ConfigureTransaction(ModelBuilder modelBuilder)
+    private static void ConfigureTransaction(ModelBuilder modelBuilder)
     {
         _ = modelBuilder.Entity<Transaction>()
             .HasKey(t => t.Id);
@@ -158,7 +158,7 @@ public sealed class AccountContext : DbContext
 
     }
 
-    private void ConfigureOutbox(ModelBuilder modelBuilder)
+    private static void ConfigureOutbox(ModelBuilder modelBuilder)
     {
         _ = modelBuilder.Entity<Outbox>()
             .HasKey(a => a.Id);

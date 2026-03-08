@@ -2,7 +2,7 @@
 using Banking.Accounts.Logic.Account;
 using Banking.Accounts.Logic.Commands;
 
-namespace Banking.Accounts.Service.Extension;
+namespace Banking.Accounts.Service.Registrations;
 
 public static class LogicExtension
 {

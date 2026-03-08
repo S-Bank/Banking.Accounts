@@ -20,4 +20,4 @@ public sealed record DepositCommand(
     AccountId AccountId,
     ReferenceId ReferenceId,
     Amount Amount)
-    : IRequest<Balance>;
+    : IRequest;

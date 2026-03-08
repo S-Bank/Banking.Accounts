@@ -1,4 +1,5 @@
-﻿using Banking.Accounts.Models.Transaction;
+﻿using Banking.Accounts.Infrastructure.Contracts.Models;
+using Banking.Accounts.Models.Transaction;
 using System.Text.Json.Serialization;
 
 namespace Banking.Accounts.Infrastructure.Contracts.Output.SystemEvents;

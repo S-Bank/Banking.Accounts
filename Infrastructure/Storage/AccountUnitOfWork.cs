@@ -9,7 +9,7 @@ namespace Banking.Accounts.Infrastructure.Storage;
 /// <summary>
 /// Реализация единицы работы для управления репозиториями счетов.
 /// </summary>
-public class AccountUnitOfWork : UnitOfWork, IAccountUnitOfWork
+public sealed class AccountUnitOfWork : UnitOfWork, IAccountUnitOfWork
 {
     /// <inheritdoc />
     public IAccountRepository Accounts { get; }

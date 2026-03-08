@@ -5,7 +5,7 @@
 /// </summary>
 public sealed class KafkaSettings
 {
-    // <summary>
+    /// <summary>
     /// Список серверов Kafka.
     /// </summary>
     public string BootstrapServers { get; set; } = string.Empty;

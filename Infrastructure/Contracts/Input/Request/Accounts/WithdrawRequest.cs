@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
+using Banking.Accounts.Infrastructure.Contracts.Models;
 
 namespace Banking.Accounts.Infrastructure.Contracts.Input.Request.Accounts;
 

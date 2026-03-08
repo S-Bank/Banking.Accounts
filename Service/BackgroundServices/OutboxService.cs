@@ -1,5 +1,4 @@
-﻿using Banking.Accounts.Abstractions.Infrastructure.Storage;
-using Banking.Accounts.Abstractions.Infrastructure.Transport.Processor;
+﻿using Banking.Accounts.Abstractions.Infrastructure.Transport.Processor;
 
 namespace Banking.Accounts.Service.BackgroundJobs;
 
@@ -7,7 +6,7 @@ namespace Banking.Accounts.Service.BackgroundJobs;
 /// Фоновый сервис для периодической обработки необработанных сообщений
 /// из таблицы Outbox и их публикации в брокер сообщений.
 /// </summary>
-public sealed class OutboxJob : BackgroundService
+public sealed class OutboxService : BackgroundService
 {
     /// <summary>
     /// Инициализирует новый экземпляр сервиса.
@@ -21,9 +20,9 @@ public sealed class OutboxJob : BackgroundService
     /// <exception cref="ArgumentNullException">
     /// Выбрасывается, если любой из обязательных параметров равен null.
     /// </exception>
-    public OutboxJob(
+    public OutboxService(
         IServiceProvider serviceProvider,
-        ILogger<OutboxJob> logger)
+        ILogger<OutboxService> logger)
     {
         ArgumentNullException.ThrowIfNull(serviceProvider);
         ArgumentNullException.ThrowIfNull(logger);
@@ -35,7 +34,7 @@ public sealed class OutboxJob : BackgroundService
     /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Outbox Processor запущен.");
+        _logger.LogInformation("Outbox serivce запущен.");
 
         while (true)
         {
@@ -74,5 +73,5 @@ public sealed class OutboxJob : BackgroundService
     }
 
     private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<OutboxJob> _logger;
+    private readonly ILogger<OutboxService> _logger;
 }

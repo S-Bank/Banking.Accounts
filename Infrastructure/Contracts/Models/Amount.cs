@@ -1,7 +1,7 @@
 ﻿using Banking.Accounts.Models.Account;
 using System.Text.Json.Serialization;
 
-namespace Banking.Accounts.Infrastructure.Contracts;
+namespace Banking.Accounts.Infrastructure.Contracts.Models;
 
 /// <summary>
 /// Представляет сумму финансовой операции.
